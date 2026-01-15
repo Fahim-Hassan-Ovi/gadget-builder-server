@@ -2,8 +2,19 @@ const { ObjectId } = require("mongodb");
 const { getDB } = require("../config/db");
 
 exports.addToCart = async (req, res) => {
-  const result = await getDB().collection("cart").insertOne(req.body);
-  res.send(result);
+  const { email, product_id, quantity, ...rest } = req.body;
+  const filter = { email, product_id };
+  const existing = await getDB().collection("cart").findOne(filter);
+  if (existing) {
+    // Increment quantity
+    const result = await getDB().collection("cart").updateOne(filter, { $inc: { quantity } });
+    res.send(result);
+  } else {
+    // Insert new
+    const newItem = { ...rest, email, product_id, quantity };
+    const result = await getDB().collection("cart").insertOne(newItem);
+    res.send(result);
+  }
 };
 
 exports.getCart = async (req, res) => {

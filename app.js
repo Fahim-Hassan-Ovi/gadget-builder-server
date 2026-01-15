@@ -6,6 +6,8 @@ const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const salesRoutes = require("./routes/salesRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 
@@ -21,6 +23,8 @@ app.use("/product", productRoutes);
 app.use("/cart", cartRoutes);
 app.use("/review", reviewRoutes);
 app.use("/payment", paymentRoutes);
+app.use("/sales", salesRoutes);
+app.use("/orders", orderRoutes);
 
 app.get("/", (req, res) => {
   res.send("Gadget Builder API is running");

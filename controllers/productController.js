@@ -22,16 +22,42 @@ exports.addProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   const id = req.params.id;
+  const { quantity, ...rest } = req.body;
+
+  // 🔒 SAFETY CHECK
+  if (quantity !== undefined) {
+    const product = await getDB()
+      .collection("product")
+      .findOne({ _id: new ObjectId(id) });
+
+    if (!product) {
+      return res.status(404).send({ error: "Product not found" });
+    }
+
+    if (product.quantity + quantity < 0) {
+      return res.status(400).send({ error: "Insufficient stock" });
+    }
+  }
+
+  let update = {};
+  if (Object.keys(rest).length) {
+    update.$set = rest;
+  }
+  if (quantity !== undefined) {
+    update.$inc = { quantity };
+  }
+
   const result = await getDB()
     .collection("product")
     .updateOne(
       { _id: new ObjectId(id) },
-      { $set: req.body },
-      { upsert: true }
+      update
     );
 
   res.send(result);
 };
+
+
 
 exports.deleteProduct = async (req, res) => {
   const id = req.params.id;
